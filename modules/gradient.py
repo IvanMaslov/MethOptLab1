@@ -1,3 +1,5 @@
+import pandas as pd
+
 
 def f(x: float):
     b = 1000.0
@@ -5,7 +7,7 @@ def f(x: float):
     return (x - b) * (x - c)
 
 
-def f_grad(funct, arg:float):
+def f_grad(funct, arg: float):
     eps = 0.000001
     return (funct(arg) - funct(arg - eps)) / eps
 
@@ -26,20 +28,21 @@ def sgd_fixed_learning_rate(funct, lr: float = 1e-1, diff_limit: float = 1e-8):
     return optimum, eval_f, eval_gf
 
 
-def sgd_fixed_learning_rate_table(f, lr_vector, diff_limit_vector):
-    res =  "| lr | dl | opt | f | grad |\n"
-    res += "| --- | ---- | --- | --- | --- |\n"
+def sgd_fixed_learning_rate_table(
+        func,
+        lr_vector,
+        diff_limit_vector
+):
+    res = list()
     for diff_limit in diff_limit_vector:
         for lr in lr_vector:
-            r = sgd_fixed_learning_rate(f, lr, diff_limit)
-            res += f'| {lr} | {diff_limit} | {r[0]} | {r[1]} | {r[2]} |\n'
-    return res
+            r = sgd_fixed_learning_rate(func, lr, diff_limit)
+            res.append([lr, diff_limit, r[0], r[1], r[2]])
+    return pd.DataFrame.from_records(data=res, columns=['lr', 'dl', 'opt', 'f', 'grad'])
 
 
 def make_gradient():
-    print(sgd_fixed_learning_rate_table(f, [1e-1, 1e-2, 1e-3, 1e-4], [1e-5, 1e-8]))
-
-
+    sgd_fixed_learning_rate_table(f, [1e-1, 1e-2, 1e-3, 1e-4], [1e-5, 1e-8])
 
 
 def make_golden_ratio():
