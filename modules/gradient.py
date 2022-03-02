@@ -41,9 +41,19 @@ def sgd_fixed_learning_rate_table(
     return pd.DataFrame.from_records(data=res, columns=['lr', 'dl', 'opt', 'f', 'grad'])
 
 
-def make_gradient():
-    sgd_fixed_learning_rate_table(f, [1e-1, 1e-2, 1e-3, 1e-4], [1e-5, 1e-8])
+# def make_gradient():
+#     sgd_fixed_learning_rate_table(f, [1e-1, 1e-2, 1e-3, 1e-4], [1e-5, 1e-8])
 
 
 def make_golden_ratio():
+    pass
+
+
+def make_gradient(
+        func,
+        diff_func,
+        x0=0,
+        diff_limit=1e-8
+):
+
     pass
