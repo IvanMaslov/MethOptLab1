@@ -1,59 +1,58 @@
-import pandas as pd
+from collections.abc import Callable, Mapping
+from typing import TypeVar
+
+import numpy as np
+
+T = TypeVar('T')
 
 
-def f(x: float):
-    b = 1000.0
-    c = 2000.0
-    return (x - b) * (x - c)
+def gradient_descent(
+        func: Callable[[T], T],
+        grad_func: Callable[[T], T],
+        step_func,  # (step: int, func: (T) -> T, grad_func: (T) -> T, pred: T) -> float
+        x0: T,
+        diff_limit: float = 1e-8
+) -> list[T]:
+    res: list[T] = [x0]
+
+    step: int = 0
+    while True:
+        pred = res[-1]
+        grad = grad_func(pred)
+        k = step_func(step=step, func=func, grad=grad, pred=pred)
+        res.append(pred - k * grad)
+
+        step = step + 1
+        if np.linalg.norm(func(res[-1]) - func(pred)) < diff_limit:
+            return res
 
 
-def f_grad(funct, arg: float):
-    eps = 0.000001
-    return (funct(arg) - funct(arg - eps)) / eps
-
-
-def sgd_fixed_learning_rate(funct, lr: float = 1e-1, diff_limit: float = 1e-8):
-    eval_f = 1
-    eval_gf = 0
-    optimum = 0
-    prev_value = funct(optimum)
-    diff_value = 1000000.0
-    while diff_value > diff_limit:
-        optimum -= lr * f_grad(funct, optimum)
-        new_value = funct(optimum)
-        eval_f += 1
-        eval_gf += 1
-        diff_value = abs(new_value - prev_value)
-        prev_value = new_value
-    return optimum, eval_f, eval_gf
-
-
-def sgd_fixed_learning_rate_table(
-        func,
-        lr_vector,
-        diff_limit_vector
+def dichotomy(
+        func: Callable[[T], T],
+        left: float,
+        right: float,
+        eps: float = 1e-3
 ):
-    res = list()
-    for diff_limit in diff_limit_vector:
-        for lr in lr_vector:
-            r = sgd_fixed_learning_rate(func, lr, diff_limit)
-            res.append([lr, diff_limit, r[0], r[1], r[2]])
-    return pd.DataFrame.from_records(data=res, columns=['lr', 'dl', 'opt', 'f', 'grad'])
+    while right > left + eps:
+        middle = (left + right) / 2
+        if func(middle - eps) < func(middle + eps):
+            right = middle
+        else:
+            left = middle
+
+    return (left + right) / 2
 
 
-# def make_gradient():
-#     sgd_fixed_learning_rate_table(f, [1e-1, 1e-2, 1e-3, 1e-4], [1e-5, 1e-8])
+def linear_search(
+        func: Callable[[T], T],
+        left: float,
+        delta: float = 1e-3,
+        eps: float = 1e-3,
+        factor: float = 2.
+) -> float:
+    right = left + delta
+    while func(right) <= func(left) + eps:
+        delta *= factor
+        right += delta
 
-
-def make_golden_ratio():
-    pass
-
-
-def make_gradient(
-        func,
-        diff_func,
-        x0=0,
-        diff_limit=1e-8
-):
-
-    pass
+    return right
