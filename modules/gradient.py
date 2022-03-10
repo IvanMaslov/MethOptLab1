@@ -1,4 +1,4 @@
-from collections.abc import Callable, Mapping
+from typing import Callable, Mapping, List, Tuple
 from typing import TypeVar
 
 import numpy as np
@@ -12,8 +12,8 @@ def gradient_descent(
         step_func,  # (step: int, func: (T) -> T, grad_func: (T) -> T, pred: T) -> float
         x0: T,
         diff_limit: float = 1e-8
-) -> list[T]:
-    res: list[T] = [x0]
+) -> List[T]:
+    res: List[T] = [x0]
 
     step: int = 0
     while True:
@@ -56,3 +56,23 @@ def linear_search(
         right += delta
 
     return right
+
+
+def generate_square(
+        x2: float,
+        y2: float,
+        xy: float
+) -> Tuple[Callable[[float, float], float], Callable[[float, float], Tuple[float, float]]]:
+    def f(x: float, y: float) -> float:
+        # f = a * xx + b * yy + c * xy
+        return x2 * x * x + y2 * y * y + xy * x * y
+
+    def grad(x: float, y: float) -> Tuple[float, float]:
+        # dx = 2ax + cy
+        # dy = 2by + cx
+        # grad = (dx, dy)
+        return x2 * x * 2 + xy * y, y2 * y * 2 + xy * x
+
+    return f, grad
+
+
