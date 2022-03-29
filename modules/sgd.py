@@ -19,7 +19,8 @@ def gradient_descent(gradient_func, start_point, iterations, eps):
 
     return trajectory, iterations
 
-class MeanSquaredError:
+
+class MSELoss:
     def function(self, regression, points, state):
         sum_square_error = 0.0
         for p in points:
@@ -42,7 +43,8 @@ class StandardGradient:
         self.step = step
 
     def next_gradient(self, current_point):
-        result = self.step * self.error_func.gradient(self.regression, random.sample(self.points, self.n), current_point)
+        result = self.step * self.error_func.gradient(self.regression, random.sample(self.points, self.n),
+                                                      current_point)
         return result
 
 
@@ -58,7 +60,9 @@ class MomentumGradient:
         self.prev_gradient = np.array([0.0] * (len(points[0][0]) + 1))
 
     def next_gradient(self, current_point):
-        result = self.mu * self.prev_gradient + self.step * self.error_func.gradient(self.regression, random.sample(self.points, self.n), current_point)
+        result = self.mu * self.prev_gradient + self.step * self.error_func.gradient(self.regression,
+                                                                                     random.sample(self.points, self.n),
+                                                                                     current_point)
         self.prev_gradient = result
         return result
 
@@ -75,7 +79,9 @@ class NesterovGradient:
         self.prev_gradient = np.array([0.0] * (len(points[0][0]) + 1))
 
     def next_gradient(self, current_point):
-        result = self.mu * self.prev_gradient + self.step * self.error_func.gradient(self.regression, random.sample(self.points, self.n), current_point + self.mu * self.prev_gradient)
+        result = self.mu * self.prev_gradient + self.step * self.error_func.gradient(self.regression,
+                                                                                     random.sample(self.points, self.n),
+                                                                                     current_point + self.mu * self.prev_gradient)
         self.prev_gradient = result
         return result
 
@@ -173,15 +179,17 @@ def generate_points(f, number_of_points, number_of_dimensions):
 
     return result
 
+
 def f(xs):
     result = 1
     for i in range(len(xs)):
         result += (2 + i) * xs[i]
     return result
 
+
 def draw_batch_size_to_iteration_plot(points, step, title):
     regression = LinearRegression()
-    error_func = MeanSquaredError()
+    error_func = MSELoss()
     eps = 1e-1
 
     batch_sizes = range(1, len(points) + 1, 2)
@@ -196,7 +204,7 @@ def draw_batch_size_to_iteration_plot(points, step, title):
                 error_func=error_func,
                 step=step
             ),
-            start_point=np.array([0.0] * (len(points[0][0]) + 1)), 
+            start_point=np.array([0.0] * (len(points[0][0]) + 1)),
             iterations=1000,
             eps=eps
         )[1]
@@ -207,15 +215,16 @@ def draw_batch_size_to_iteration_plot(points, step, title):
     plt.ylabel(f'Iterations before distance between points <= {eps}')
     plt.plot(batch_sizes, iterations)
 
+
 def build_plot(label, train_points, eps, get_gradient_func):
     import time
     regression = LinearRegression()
-    error_func = MeanSquaredError()
+    error_func = MSELoss()
 
     start_time = time.time()
     trajectory = gradient_descent(
         gradient_func=get_gradient_func(regression, train_points, error_func),
-        start_point=np.array([0.0] * (len(train_points[0][0]) + 1)), 
+        start_point=np.array([0.0] * (len(train_points[0][0]) + 1)),
         iterations=1000,
         eps=eps
     )[0][1:]
@@ -224,5 +233,5 @@ def build_plot(label, train_points, eps, get_gradient_func):
     print(f'function calls: {regression.function_calls}')
     print(f'gradient calls: {regression.gradient_calls}')
     print(f'seconds: {time.time() - start_time}')
-    return plt.plot(range(len(trajectory)), [error_func.function(regression, train_points, x) for x in trajectory], label=label)[0]
-
+    return plt.plot(range(len(trajectory)), [error_func.function(regression, train_points, x) for x in trajectory],
+                    label=label)[0]
