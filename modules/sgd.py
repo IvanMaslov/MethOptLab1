@@ -173,7 +173,7 @@ def generate_points(f, number_of_points, number_of_dimensions):
     for i in range(number_of_points):
         point = []
         for j in range(number_of_dimensions):
-            x = (random.uniform(-5, 5) + shifts[j]) * multipliers[j]
+            x = (np.random.normal(0, 1) + shifts[j]) * multipliers[j]
             point.append(x)
         result.append((point, f(point)))
 
